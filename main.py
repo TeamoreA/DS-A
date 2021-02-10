@@ -4,133 +4,165 @@ class Node:
         self.next = None
         self.prev = None
 
-
-class DoublyLinkedList:
+class CircularDoublyLL:
     def __init__(self):
         self.head = None
         self.tail = None
 
     def __iter__(self):
-        current_node = self.head
-        while current_node:
-            yield current_node
-            current_node = current_node.next
+        node = self.head
+        if not node:
+            print("The CDLL is empty")
+        else:
+            while node:
+                yield node
+                node = node.next
+                if node == self.tail.next:
+                    break
 
     def create(self, value):
         new_node = Node(value)
         self.head = new_node
         self.tail = new_node
-        return "The DLL has been created"
-    
+        new_node.next = new_node
+        new_node.prev = new_node
+        print("CDLL created successfuly")
+
+    def search(self, value):
+        node = self.head
+        if not Node:
+            return "The CDLL is empty"
+        i = 0
+        while node:
+            if node.value == value:
+                return [value, i]
+            node = node.next
+            i += 1
+            if node == self.tail.next:
+                break
+        return "The value is not found"
+
     def traverse(self):
-        current_node = self.head
-        if not current_node:
-            print("The list is empty")
-        while current_node:
-            print(current_node.value)
-            current_node = current_node.next
+        node = self.head
+        if not node:
+            print("The CDLL is empty")
+        else:
+            while node:
+                print(node.value)
+                node = node.next
+                if node == self.tail.next:
+                    break
 
     def reverse_traverse(self):
-        current_node = self.tail
-        if not current_node:
-            print("The list is empty")
+        node = self.tail
+        if not node:
+            print('The CDLL is empty')
         else:
-            while current_node:
-                print(current_node.value)
-                current_node = current_node.prev
+            while node:
+                print(node.value)
+                node = node.prev
+                if node == self.head.prev:
+                    break
 
     def delete(self, value):
         node = self.head
         if not node:
-            print("The list is empty")
+            return "The CDLL is empty"
+        temp_node = node.next
+        if value == self.head.value:
+            self.tail.next = temp_node
+            temp_node.prev = self.tail
+            self.head = temp_node
+            return value
+        elif value == self.tail.value:
+            self.tail.prev.next = self.head
+            self.head.next = self.tail.prev
+            self.tail = self.tail.prev
+            return value
         else:
-            if value == self.head.value:
-                next_node = self.head.next
-                self.head = next_node
-                next_node.prev = None
-            elif value == self.tail.value:
-                prev_node = self.tail.prev
-                self.tail = prev_node
-                prev_node.next = None
-            else:
-                while node:
-                    if node.value == value:
-                        prev_node = node.prev
-                        next_node = node.next
-                        prev_node.next = next_node
-                        next_node.prev = prev_node
-                    node = node.next
+            while temp_node:
+                if temp_node == self.tail:
+                    break
+                if temp_node.value == value:
+                    temp_node.prev.next = temp_node.next
+                    temp_node.next.prev = temp_node.prev
+                    return value
+                temp_node = temp_node.next
+        return "{} not found in the CDLL".format(value)
 
     def delete_multiple(self, values):
-        for i in values:
-            self.delete(i)
-
-    def search(self, value):
+        for val in values:
+            self.delete(val)
+    def clear(self):
         node = self.head
         if not node:
-            print("The list is empty")
+            print("The CDLL is empty")
         else:
-            i = 0
             while node:
-                if value == node.value:
-                    print([value, i])
-                if node == self.tail and value != node.value:
-                    print("Value not found in the list")
-                i += 1
+                node.next = None
                 node = node.next
+            self.head = None
+            self.tail = None
+            print("CDLL cleared successfuly")
+
 
     def insert(self, value, location=0):
-        current_node = self.head
+        node = self.head
         new_node = Node(value)
-        if not current_node:
+        if not node:
             self.create(value)
         else:
             if location == 0:
-                current_node.prev = new_node
+                new_node.next = self.head
+                new_node.prev = self.tail
+                self.head.prev = new_node
                 self.head = new_node
-                new_node.next = current_node
+                self.tail.next = new_node
+                print("Head element added successfuly")
             else:
                 i = 0
-                while i < location:
-                    current_node = current_node.next
+                while i < location-1:
+                    node = node.next
                     i += 1
-                    if not current_node:
-                        return "Location is out of range"
-                if current_node == self.tail:
-                    new_node.prev = current_node
-                    current_node.next = new_node
+                    if node == self.tail.next:
+                        break
+                
+                if node == self.tail:
+                    new_node.next = self.head
+                    new_node.prev = self.tail
+                    self.tail.next = new_node
+                    self.head.prev = new_node
                     self.tail = new_node
+                    print("Tail element added successfuly")
                 else:
-                    next_node = current_node.next
-                    current_node.next = new_node
-                    new_node.next = next_node
-                    new_node.prev = current_node
-                    next_node.prev = new_node
-                    
-        return value
+                    new_node.next = node.next
+                    new_node.prev = node
+                    node.next.prev = new_node
+                    node.next = new_node
+                    print("New element added at location {}".format(location))
 
 
 
-doublyll = DoublyLinkedList()
-print("====create====")
-print(doublyll.create(1))
-print("====insert====")
-print(doublyll.insert(2))
-print("====insert====")
-print(doublyll.insert(3))
-print("====insert====")
-print(doublyll.insert(4))
-print("====insert====")
-print(doublyll.insert(5,3))
-print("===traverse====")
-doublyll.traverse()
-print("===reverse_traverse====")
-doublyll.reverse_traverse()
-print("===search====")
-doublyll.search(5)
-print("===delete====")
-doublyll.delete(2)
-print("===delete_multiple====")
-doublyll.delete_multiple([1,2,3])
+circulardll = CircularDoublyLL()
+print('====create====')
+circulardll.create("Githae")
+print('====insert====')
+circulardll.insert("Maina",1)
+print('====insert====')
+circulardll.insert("Kamau",2)
+print("====search===")
+print(circulardll.search("Githae"))
+print('====traverse====')
+circulardll.traverse()
+print('====reverse_traverse====')
+circulardll.reverse_traverse()
+# print('====delete====')
+# print(circulardll.delete("Maina"))
+# print('====delete_multiple====')
+# print(circulardll.delete_multiple(['Kamau',"Maina"]))
+# print("====clear====")
+# circulardll.clear()
+# circulardll.clear()
 print('====iter====')
-print([i.value for i in doublyll])
+print([i.value for i in circulardll])
+
